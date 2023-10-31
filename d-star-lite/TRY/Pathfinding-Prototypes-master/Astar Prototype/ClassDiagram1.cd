@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Astar">
+    <Position X="7.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAACAIQAAAAAAAAABAAAAAEAIAAAAAAABAAAEI=</HashCode>
+      <FileName>Assets\Scripts\Astar.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Grid">
+    <Position X="2.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAABAAAIAAAAAAAAAAgAAAAIAAAACAgAAGAAAIkA=</HashCode>
+      <FileName>Assets\Scripts\Grid.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Heap&lt;T&gt;">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAACAAAAQAAAgAAAQAAAARCAAAAAAAAAAQAAA=</HashCode>
+      <FileName>Assets\Scripts\Heap.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Node" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAACEAAAACARAAAAAAAAIAAAACBIAAAAAAAAAAAE=</HashCode>
+      <FileName>Assets\Scripts\Node.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="PathRequestManager">
+    <Position X="6" Y="2.5" Width="1.5" />
+    <NestedTypes>
+      <Struct Name="PathRequestManager.PathRequest" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\Scripts\PathRequestManager.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAQAAAAAAIAAAAAAACAAACAABAICAAAAAAAAIAAEA=</HashCode>
+      <FileName>Assets\Scripts\PathRequestManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SeekerScript">
+    <Position X="9.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQEAAAAIDAAAAAAIAAKAAAAAAIAAQAAAABAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\SeekerScript.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="IHeapItem&lt;T&gt;">
+    <Position X="6" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Heap.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

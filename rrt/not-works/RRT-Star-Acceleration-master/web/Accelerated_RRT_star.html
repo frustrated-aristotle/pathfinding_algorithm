@@ -1,0 +1,93 @@
+<h1>Accelerated RRT*</h1>
+<h5>Yoni Weidenfeld, Roee Tarab</h5>
+<h4>This is a python project, to accelerate the RRT* algorithm, by identifying obstacles "on-the-fly" and removing them from the sampling range<br>
+</h4>
+
+<b><u>Demonstration:</u></b>
+<br>
+<P>A short clip presenting our project
+<br>
+[rrt_py_extract_obstacles.mp4]
+</p>
+<p>
+<b><u>Code:</u></b>
+<br>
+<br>
+The project can be found <a href="https://github.com/yoniwe1/RRT-Star-Acceleration" target="_blank">Here</a>.<br>
+<p>
+<b><u>Workspace:</u></b><br/>
+	<br/>
+	[RRT_Star_Acceleration.png]
+</p>	
+
+	
+<p>
+<b><u>Project flow:</u></b>
+<br>
+<p>
+This project is programmed in Python, working with OpenCV, Shapely, itertools, matplotlib libraries and based on RRT* Algorithm. <br/>
+<u>The project's purpose</u> is to accelerate RRT* algorithm. in the basic algorithm, random sampling may generate points within
+ an obstacle's area ,
+ thereby RRT* will identify it as an unuseful point, ignoring it and continuing to generate new random points.<br/>
+With this logic, we can think about big obstacles in a map, and a lot of samplings may fall on an obstacles' areas - waste of time. 
+	<br/>
+	Our program prevents this problem from occuring  .<br/><br/>  <u>Solution Flow:</u>
+	<ol>
+	<li> Input:<ul> <li>The map. the program turns it to black-white binary map (127 is the threshold). white represents the obstacle.</li>
+		<li>Source point of the driver.</li>
+		<li>Destination point.</li>
+		</ul>
+	</li><li>the program computes driver's width and radius ( useful later. driver's shape may be
+		not convex) and extends the borders map by adding black borders, that is becuase of errors occuring near the original edges.
+	</li><li>If the random point falls on an obstacle (which can be not convex): 
+		<ul>
+		<li>We isolate the obstacle area from the rest of the map by finding 
+		<a href="https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_core/py_basic_ops/py_basic_ops.html#basic-ops" target="_blank">ROI</a>
+		( function: "findROI" ).
+		</li>
+		<li>With ROI we find minimum rectangle that wraps the obstacle. might be rotated.(function: "findMinRect" ).</li>
+		</ul>
+	</li><li> if the random point falls near the obstacle but not inside it:
+		<ul>
+			<u>Remark:</u> we take care of this case because if the driver is located very close to the obstacle in step <i>i</i> 
+			and needs to turn around in order to go to step <i> i+1</i> , there is a risk that he will collide with the obstacle
+			while turning around.
+			to prevent this case we:
+
+			<li> check for obstacle in surrounding of step <i>i</i> according to driver's radius.</li>
+			<li>if so and it's a new obstacle, we act in a similar way to step 3.</li>
+		</ul>
+	</li><li> when the random point falls on a safe point, the program checks that the path between the current point and 
+		the nearest point in the tree is free from obstacles ( the width of the path is according to driver's width ).<br>
+		if there is an obstacle in this path,  we act in a similar way to step 3.
+	</li><li> once we have the minimum rectangle that wraps the obstacle we move on to the second part of this program -
+	excluding all points within the obstacle area form random generator points.<br>
+		After a long research in order to reduce rectangle scanning time, we built "update_excluded()" funtion.
+		This python script locates all points inside the bounded rectangle, and extracts them from the sample range. It does so by identifying all the inner points of the rectangle, divided into two triangles by the main diagonal, and using the meshgrid method of numpy library to seperate integer points outside the rectangle from those inside it. Therefore, maximum precision is acheived, without having to settle for speed of execution. Another calculation is made for the points on the main diagonal that are not included in the insidetriangle() function, and is made in the diagonal() function.
+		 
+	</li><li> <u>Remark:</u> we don't exclude obstacles if our destination point is inside it. you can think about a hollow obstacle in this case.
+		</p>
+	</li></ol>
+<br>
+
+[during_running.png]
+<br>
+[big_obstacle.png]
+<br><br>
+<u>How to reconstruct the project?</u>
+	<ol>
+	<li>Just attach all python files to the project. The program starts from rrt.py file.</li>
+	<li>Import the following packages: random, math, copy, numpy, matplotlib.pyplot, cv2(openCV), itertools, shapely.geometry</li>	
+	<li>Run it.</li>
+	</ol>
+	
+<p>
+<b><u>Contact us:</u></b><br>
+Yoni Weidenfeld: <a href="mailto:yoni_we1@hotmail.com" target="_blank">yoni_we1@hotmail.com</a><br>
+Roee Tarab: <a href="mailto:roeetarab@gmail.com " target="_blank">roeetarab@gmail.com </a> <br>
+
+<br>
+
+
+</p>
+</p>
