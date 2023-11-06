@@ -3,7 +3,7 @@ from grid import OccupancyGridMap
 import numpy as np
 from utils import heuristic, Vertex, Vertices
 from typing import Dict, List
-
+from turning_point_finder import TurningPointFinder
 OBSTACLE = 255
 UNOCCUPIED = 0
 
@@ -16,6 +16,7 @@ class DStarLite:
         :param s_goal: end location
         """
         self.new_edges_and_old_costs = None
+
 
         # algorithm start
         self.s_start = s_start
@@ -31,6 +32,8 @@ class DStarLite:
                                            exploration_setting='8N')
 
         self.rhs[self.s_goal] = 0
+        self.a = 13
+        print("xxxxxxxxxxa")
         self.U.insert(self.s_goal, Priority(heuristic(self.s_start, self.s_goal), 0))
 
     def calculate_key(self, s: (int, int)):
@@ -124,10 +127,11 @@ class DStarLite:
 
             ### algorithm sometimes gets stuck here for some reason !!! FIX
             self.s_start = arg_min
+
             path.append(self.s_start)
             # scan graph for changed costs
             changed_edges_with_old_cost = self.rescan()
-            #print("len path: {}".format(len(path)))
+            # print("len path: {}".format(len(path)))
             # if any edge costs changed
             if changed_edges_with_old_cost:
                 self.k_m += heuristic(self.s_last, self.s_start)
@@ -155,4 +159,5 @@ class DStarLite:
                             self.update_vertex(u)
             self.compute_shortest_path()
         print("path found!")
+        print(path)
         return path, self.g, self.rhs

@@ -84,7 +84,7 @@ class OccupancyGridMap:
         :return:
         """
         (x, y) = vertex
-        if self.exploration_setting == '4N':  # change this
+        if self.exploration_setting == '8N':  # change this
             movements = get_movements_4n(x=x, y=y)
         else:
             movements = get_movements_8n(x=x, y=y)
@@ -127,7 +127,7 @@ class OccupancyGridMap:
         nodes = [(x, y) for x in range(px - view_range, px + view_range + 1)
                  for y in range(py - view_range, py + view_range + 1)
                  if self.in_bounds((x, y))]
-        print("nodes is",nodes)
+        print("nodes is", nodes)
         print({node: UNOCCUPIED if self.is_unoccupied(pos=node) else OBSTACLE for node in nodes})
         return {node: UNOCCUPIED if self.is_unoccupied(pos=node) else OBSTACLE for node in nodes}
 

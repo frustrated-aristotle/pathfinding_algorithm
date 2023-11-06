@@ -1,7 +1,8 @@
-import pygame
 import time
+import pygame
 from grid import OccupancyGridMap
 from typing import List
+from turning_point_finder import TurningPointFinder
 
 # Define some colors
 BLACK = (0, 0, 0)  # BLACK
@@ -11,6 +12,8 @@ START = (255, 0, 0)  # RED
 GRAY1 = (145, 145, 102)  # GRAY1
 OBSTACLE = (77, 77, 51)  # GRAY2
 LOCAL_GRID = (0, 0, 80)  # BLUE
+TURNING_POINT = (33, 100, 119)  # PETROLEUM BLUE
+CURRENT = (223, 28, 237)  # PURPLE
 
 colors = {
     0: UNOCCUPIED,
@@ -31,7 +34,13 @@ def engeller(self, row,col):
         self.world.set_obstacle(grid_cell)
         self.observation = {"pos": grid_cell, "type": OBSTACLE}
 
+
 class Animation:
+
+    path = []
+    turning_point = TurningPointFinder(path=path)
+
+    counter = 0
 
     def __init__(self,
                  title="D* Lite Path Planning",
@@ -42,7 +51,7 @@ class Animation:
                  y_dim=50,
                  start=(0, 0),
                  goal=(50, 50),
-                 viewing_range=3):
+                 viewing_range=10):
 
         self.width = width
         self.height = height
@@ -107,11 +116,25 @@ class Animation:
         if path is not None:
             for step in path:
                 # draw a moving robot, based on current coordinates
+
                 step_center = [round(step[1] * (self.width + self.margin) + self.width / 2) + self.margin,
                                round(step[0] * (self.height + self.margin) + self.height / 2) + self.margin]
 
+                if(Animation.counter < len(path)):
+                    Animation.counter += 1
+
                 # draw robot position as red circle
-                pygame.draw.circle(self.screen, START, step_center, round(self.width / 2) - 2)
+                if self.turning_point.turning_points.__contains__(step):
+                    pygame.draw.circle(self.screen, TURNING_POINT, step_center, round(self.width / 2) - 2)
+                elif step is self.current:
+                    pygame.draw.circle(self.screen, CURRENT, step_center, round(self.width / 2) - 2)
+                    print("CURRENT IS", step)
+                else:
+                    pygame.draw.circle(self.screen, START, step_center, round(self.width / 2) - 2)
+
+
+
+
 
     def display_obs(self, observations=None):
         if observations is not None:
@@ -120,6 +143,19 @@ class Animation:
                                                       (self.margin + self.height) * o[0] + self.margin,
                                                       self.width,
                                                       self.height])
+
+    def on_space_clicked(self, path):
+        print("Space Button is clicked!")
+        (x, y) = path[1]
+        self.set_position((x, y))
+        self.turning_point.count = 0
+        if self.turning_point is not None:
+            self.turning_point.find_turning_points(path)
+
+    def draw_rounding_points(self, turning_points):
+        if len(turning_points) > 0:
+            for point in turning_points:
+                print("POINT IS", point)
 
     def run_game(self, path=None):
         if path is None:
@@ -136,8 +172,9 @@ class Animation:
             elif (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE) or self.cont:
                 # space bar pressed. call next action
                 if path:
-                    (x, y) = path[1]
-                    self.set_position((x, y))
+                    # (x, y) = path[1]
+                    # self.set_position((x, y))
+                    self.on_space_clicked(path)
 
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_BACKSPACE:
                 print("backspace automates the press space")
@@ -162,7 +199,7 @@ class Animation:
                 if self.world.is_unoccupied(grid_cell):
                     self.world.set_obstacle(grid_cell)
                     self.observation = {"pos": grid_cell, "type": OBSTACLE}
-                print(row,col)   
+                print(row, col)
 
             # remove obstacle by holding right-click
             elif pygame.mouse.get_pressed()[2]:
@@ -195,7 +232,6 @@ class Animation:
                                   (self.margin + self.height) * row + self.margin,
                                   self.width,
                                   self.height])
-
         self.display_path(path=path)
         # fill in the goal cell with green
         pygame.draw.rect(self.screen, GOAL, [(self.margin + self.width) * self.goal[1] + self.margin,
@@ -203,13 +239,17 @@ class Animation:
                                              self.width,
                                              self.height])
 
+
+
         # draw a moving robot, based on current coordinates
         robot_center = [round(self.current[1] * (self.width + self.margin) + self.width / 2) + self.margin,
                         round(
                             self.current[0] * (self.height + self.margin) + self.height / 2) + self.margin]
 
         # draw robot position as red circle
-        pygame.draw.circle(self.screen, START, robot_center, round(self.width / 2) - 2)
+        # pygame.draw.circle(self.screen, START, robot_center, round(self.width / 2) - 2)
+        pygame.draw.circle(self.screen, CURRENT, robot_center, round(self.width / 2) - 2)
+
 
         # draw robot local grid map (viewing range)
         pygame.draw.rect(self.screen, LOCAL_GRID,

@@ -1,12 +1,24 @@
 from gui import Animation
 from d_star_lite import DStarLite
 from grid import OccupancyGridMap, SLAM
+from turning_point_finder import TurningPointFinder
 
 OBSTACLE = 255
 UNOCCUPIED = 0
+next_Index = 0
+
+def find_turning_points():
+    print("*************")
+    for node in path:
+        node_index = path.index(node)
+        if node_index != 0 and node_index != len(path) -1:
+            prior_node = path[node_index - 1]
+            posterior_node = path[node_index + 1]
+            if prior_node[0] != posterior_node[0] and prior_node[1] != posterior_node[1]:
+                a = UNOCCUPIED
+                print("This is a turning point and its coordinates are:", node)
 
 if __name__ == '__main__':
-
     """
     set initial values for the map occupancy grid
     |----------> y, column
@@ -15,11 +27,12 @@ if __name__ == '__main__':
     V (x=2, y=0)
     x, row
     """
-    x_dim = 14
-    y_dim = 14
-    start = (0,0)
-    goal = (13,6)
-    view_range = 2
+    x_dim = 15
+    y_dim = 15
+    start = (0, 0)
+    goal = (13, 6)
+    view_range = 15
+    next_Index = 3
 
     gui = Animation(title="D* Lite Path Planning",
                     width=40,
@@ -51,17 +64,18 @@ if __name__ == '__main__':
 
     # move and compute path
     path, g, rhs = dstar.move_and_replan(robot_position=new_position)
+    print("PATH PATH PATH", path, g, rhs)
 
+    turning_point = TurningPointFinder(path)
+    gui.turning_point = turning_point
     while not gui.done:
         # update the map
         # print(path)
         # drive gui
         gui.run_game(path=path)
-
         new_position = gui.current
         new_observation = gui.observation
         new_map = gui.world
-
         """
         if new_observation is not None:
             if new_observation["type"] == OBSTACLE:
