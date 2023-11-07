@@ -1,0 +1,9 @@
+gui.py
+
+def run_game()
+elif event.type == pygame.KEYDOWN and event.key == pygame.K_BACKSPACE:
+                print("backspace automates the press space")
+                if not self.cont:
+                    self.cont = True
+                else:
+                    self.cont = False

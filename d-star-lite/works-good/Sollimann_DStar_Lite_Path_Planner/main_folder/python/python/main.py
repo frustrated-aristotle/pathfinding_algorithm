@@ -7,16 +7,6 @@ OBSTACLE = 255
 UNOCCUPIED = 0
 next_Index = 0
 
-def find_turning_points():
-    print("*************")
-    for node in path:
-        node_index = path.index(node)
-        if node_index != 0 and node_index != len(path) -1:
-            prior_node = path[node_index - 1]
-            posterior_node = path[node_index + 1]
-            if prior_node[0] != posterior_node[0] and prior_node[1] != posterior_node[1]:
-                a = UNOCCUPIED
-                print("This is a turning point and its coordinates are:", node)
 
 if __name__ == '__main__':
     """
@@ -64,10 +54,12 @@ if __name__ == '__main__':
 
     # move and compute path
     path, g, rhs = dstar.move_and_replan(robot_position=new_position)
-    print("PATH PATH PATH", path, g, rhs)
+    print("Before turning point",gui.turning_point_finder)
+    turning_point_finder = TurningPointFinder(path)
+    gui.turning_point_finder = turning_point_finder
+    print("Turning point: ", gui.turning_point_finder)
 
-    turning_point = TurningPointFinder(path)
-    gui.turning_point = turning_point
+
     while not gui.done:
         # update the map
         # print(path)

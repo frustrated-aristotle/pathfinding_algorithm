@@ -33,7 +33,6 @@ class DStarLite:
 
         self.rhs[self.s_goal] = 0
         self.a = 13
-        print("xxxxxxxxxxa")
         self.U.insert(self.s_goal, Priority(heuristic(self.s_start, self.s_goal), 0))
 
     def calculate_key(self, s: (int, int)):
@@ -159,5 +158,4 @@ class DStarLite:
                             self.update_vertex(u)
             self.compute_shortest_path()
         print("path found!")
-        print(path)
         return path, self.g, self.rhs

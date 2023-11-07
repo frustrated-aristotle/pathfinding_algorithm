@@ -38,10 +38,10 @@ def engeller(self, row,col):
 class Animation:
 
     path = []
-    turning_point = TurningPointFinder(path=path)
+    turning_point_finder = TurningPointFinder(path=path)
 
     counter = 0
-
+    #Is there any difference between 60 hz and 144 hz
     def __init__(self,
                  title="D* Lite Path Planning",
                  width=10,
@@ -63,7 +63,7 @@ class Animation:
         self.observation = {"pos": None, "type": None}
         self.goal = goal
         self.viewing_range = viewing_range
-
+        self.turning_points = []
         pygame.init()
 
         # Set the 'width' and 'height' of the screen
@@ -112,28 +112,27 @@ class Animation:
     def set_start(self, start: (int, int)):
         self.start = start
 
+    @staticmethod
+    def center_pos(width, margin, height, coordinate_tuple) -> (int, int):
+        x = coordinate_tuple[0]
+        y = coordinate_tuple[1]
+        step_center = [round(y * (width + margin) + width / 2) + margin,
+                               round(x * (height + margin) + height / 2) + margin]
+        return step_center
+
+
     def display_path(self, path=None):
         if path is not None:
             for step in path:
                 # draw a moving robot, based on current coordinates
+                step_center = Animation.center_pos(self.width, self.margin, self.height, step)
+                #step_center = [round(step[1] * (self.width + self.margin) + self.width / 2) + self.margin,
+                #               round(step[0] * (self.height + self.margin) + self.height / 2) + self.margin]
 
-                step_center = [round(step[1] * (self.width + self.margin) + self.width / 2) + self.margin,
-                               round(step[0] * (self.height + self.margin) + self.height / 2) + self.margin]
-
-                if(Animation.counter < len(path)):
-                    Animation.counter += 1
-
-                # draw robot position as red circle
-                if self.turning_point.turning_points.__contains__(step):
-                    pygame.draw.circle(self.screen, TURNING_POINT, step_center, round(self.width / 2) - 2)
-                elif step is self.current:
+                if step is self.current:
                     pygame.draw.circle(self.screen, CURRENT, step_center, round(self.width / 2) - 2)
-                    print("CURRENT IS", step)
                 else:
                     pygame.draw.circle(self.screen, START, step_center, round(self.width / 2) - 2)
-
-
-
 
 
     def display_obs(self, observations=None):
@@ -148,14 +147,20 @@ class Animation:
         print("Space Button is clicked!")
         (x, y) = path[1]
         self.set_position((x, y))
-        self.turning_point.count = 0
-        if self.turning_point is not None:
-            self.turning_point.find_turning_points(path)
+       
 
-    def draw_rounding_points(self, turning_points):
-        if len(turning_points) > 0:
-            for point in turning_points:
-                print("POINT IS", point)
+    def get_turning_points(self, path):
+        self.turning_point_finder.find_turning_points(path)
+        self.turning_points = self.turning_point_finder.turning_points
+
+    def draw_rounding_points(self, path):
+        self.get_turning_points(path=path)
+        if len(self.turning_points) > 0:
+            for point in self.turning_points:
+                point_center = Animation.center_pos(self.width, self.margin, self.height, point)
+                pygame.draw.circle(self.screen, TURNING_POINT, point_center, round(self.width / 2) - 2)
+                
+
 
     def run_game(self, path=None):
         if path is None:
@@ -163,6 +168,28 @@ class Animation:
 
         grid_cell = None
         self.cont = False
+
+        # get inputs from keyboard and
+        self.input_validation(path)
+        # set the screen background
+        self.screen.fill(BLACK)
+
+        # draw the grid
+        self.draw_grid()
+        self.display_path(path=path)
+        self.draw_rounding_points(path=path)
+        self.draw_goal()
+        self.draw_current_cell()
+        self.draw_range()    
+        # set game tick
+        self.clock.tick(20)
+
+        # go ahead and update screen with that we've drawn
+        pygame.display.flip()
+    # be 'idle' friendly. If you forget this, the program will hang on exit
+    pygame.quit()
+    
+    def input_validation(self, path):
         for event in pygame.event.get():
 
             if event.type == pygame.QUIT:  # if user clicked close
@@ -172,58 +199,34 @@ class Animation:
             elif (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE) or self.cont:
                 # space bar pressed. call next action
                 if path:
-                    # (x, y) = path[1]
-                    # self.set_position((x, y))
                     self.on_space_clicked(path)
+            
+            elif (event.type == pygame.KEYDOWN and event.key == pygame.K_i):
+                print("Carry your robot to where you want!")
+                tuple_str = input("Type its point like (x,y) int tuple)")
+                tuple_list = tuple_str.split(",")
+                tuple_input = (int(tuple_list[0]), int(tuple_list[1]))
+                print(type(tuple_input), tuple_input)
+                self.set_position(tuple_input)
 
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_BACKSPACE:
-                print("backspace automates the press space")
-                if not self.cont:
-                    self.cont = True
-                else:
-                    self.cont = False
+            elif (event.type == pygame.KEYDOWN and event.key == pygame.K_m):
+                tuple_str = input("Obstacle point like (x,y) int tuple)")
+                tuple_list = tuple_str.split(",")
+                tuple_input = (int(tuple_list[0]), int(tuple_list[1]))
+                print(type(tuple_input), tuple_input)
+                self.add_obstacle(tuple_input)
+
 
             # set obstacle by holding left-click
             elif pygame.mouse.get_pressed()[0]:
-                # User clicks the mouse. Get the position
-                (col, row) = pygame.mouse.get_pos()
-
-                # change the x/y screen coordinates to grid coordinates
-                x = row // (self.height + self.margin)
-                y = col // (self.width + self.margin)
-
-                # turn pos into cell
-                grid_cell = (x, y)
-
-                # set the location in the grid map
-                if self.world.is_unoccupied(grid_cell):
-                    self.world.set_obstacle(grid_cell)
-                    self.observation = {"pos": grid_cell, "type": OBSTACLE}
-                print(row, col)
+                self.add_obstacle()
 
             # remove obstacle by holding right-click
             elif pygame.mouse.get_pressed()[2]:
-                # User clicks the mouse. Get the position
-                (col, row) = pygame.mouse.get_pos()
+                self.remove_obstacle()
+            
+    def draw_grid(self):
 
-                # change the x/y screen coordinates to grid coordinates
-                x = row // (self.height + self.margin)
-                y = col // (self.width + self.margin)
-
-                # turn pos into cell
-                grid_cell = (x, y)
-
-                # set the location in the grid map
-                if not self.world.is_unoccupied(grid_cell):
-                    print("grid cell: ".format(grid_cell))
-                    self.world.remove_obstacle(grid_cell)
-                    self.observation = {"pos": grid_cell, "type": UNOCCUPIED}
-            default_engeller(self)
-
-        # set the screen background
-        self.screen.fill(BLACK)
-
-        # draw the grid
         for row in range(self.x_dim):
             for column in range(self.y_dim):
                 # color the cells
@@ -232,42 +235,62 @@ class Animation:
                                   (self.margin + self.height) * row + self.margin,
                                   self.width,
                                   self.height])
-        self.display_path(path=path)
+    
+    def draw_goal(self):
         # fill in the goal cell with green
         pygame.draw.rect(self.screen, GOAL, [(self.margin + self.width) * self.goal[1] + self.margin,
                                              (self.margin + self.height) * self.goal[0] + self.margin,
                                              self.width,
                                              self.height])
 
-
-
-        # draw a moving robot, based on current coordinates
-        robot_center = [round(self.current[1] * (self.width + self.margin) + self.width / 2) + self.margin,
-                        round(
-                            self.current[0] * (self.height + self.margin) + self.height / 2) + self.margin]
-
-        # draw robot position as red circle
+    def draw_current_cell(self):
         # pygame.draw.circle(self.screen, START, robot_center, round(self.width / 2) - 2)
+        robot_center = Animation.center_pos(self.width, self.margin,self.height,self.current)
         pygame.draw.circle(self.screen, CURRENT, robot_center, round(self.width / 2) - 2)
 
-
+    def draw_range(self):
         # draw robot local grid map (viewing range)
+        robot_center = Animation.center_pos(self.width, self.margin,self.height,self.current)
         pygame.draw.rect(self.screen, LOCAL_GRID,
                          [robot_center[0] - self.viewing_range * (self.height + self.margin),
                           robot_center[1] - self.viewing_range * (self.width + self.margin),
                           2 * self.viewing_range * (self.height + self.margin),
                           2 * self.viewing_range * (self.width + self.margin)], 2)
 
-        # set game tick
-        self.clock.tick(20)
+    def add_obstacle(self):
+        # User clicks the mouse. Get the position
+        (col, row) = pygame.mouse.get_pos()
 
-        # go ahead and update screen with that we've drawn
-        pygame.display.flip()
+        # change the x/y screen coordinates to grid coordinates
+        x = row // (self.height + self.margin)
+        y = col // (self.width + self.margin)
 
-    # be 'idle' friendly. If you forget this, the program will hang on exit
-    pygame.quit()
+        # turn pos into cell
+        grid_cell = (x, y)
 
+        # set the location in the grid map
+        if self.world.is_unoccupied(grid_cell):
+            self.world.set_obstacle(grid_cell)
+            self.observation = {"pos": grid_cell, "type": OBSTACLE}
+        print(row, col)
 
+    def remove_obstacle(self):
+        # User clicks the mouse. Get the position
+        (col, row) = pygame.mouse.get_pos()
+
+        # change the x/y screen coordinates to grid coordinates
+        x = row // (self.height + self.margin)
+        y = col // (self.width + self.margin)
+
+        # turn pos into cell
+        grid_cell = (x, y)
+
+        # set the location in the grid map
+        if not self.world.is_unoccupied(grid_cell):
+            print("grid cell: ".format(grid_cell))
+            self.world.remove_obstacle(grid_cell)
+            self.observation = {"pos": grid_cell, "type": UNOCCUPIED}
+    
 def default_engeller(self):
         
         engeller(self,103,128)
