@@ -64,6 +64,7 @@ class Animation:
         self.goal = goal
         self.viewing_range = viewing_range
         self.turning_points = []
+        
         pygame.init()
 
         # Set the 'width' and 'height' of the screen
@@ -90,6 +91,8 @@ class Animation:
 
         # set font
         pygame.font.SysFont('Comic Sans MS', 36)
+        self.default_engeller()
+
 
         # Loop until the user clicks the close button
         self.done = False
@@ -180,7 +183,7 @@ class Animation:
         self.draw_rounding_points(path=path)
         self.draw_goal()
         self.draw_current_cell()
-        self.draw_range()    
+        self.draw_range()   
         # set game tick
         self.clock.tick(20)
 
@@ -290,60 +293,60 @@ class Animation:
             print("grid cell: ".format(grid_cell))
             self.world.remove_obstacle(grid_cell)
             self.observation = {"pos": grid_cell, "type": UNOCCUPIED}
-    
-def default_engeller(self):
         
-        engeller(self,103,128)
-        engeller(self,144,132)
-        engeller(self,140,106)
-        engeller(self,103,96)
+    def default_engeller(self):
+            
+            engeller(self,103,128)
+            engeller(self,144,132)
+            engeller(self,140,106)
+            engeller(self,103,96)
 
-        engeller(self,261,96)
-        engeller(self,266,140)
-        engeller(self,293,95)
-        engeller(self,296,138)
+            engeller(self,261,96)
+            engeller(self,266,140)
+            engeller(self,293,95)
+            engeller(self,296,138)
 
-        engeller(self,401,96)
-        engeller(self,413,140)
-        engeller(self,476,142)
-        engeller(self,458,93)
+            engeller(self,401,96)
+            engeller(self,413,140)
+            engeller(self,476,142)
+            engeller(self,458,93)
 
-        # orta_ust
-        # engeller(self,144,304)
-        engeller(self,94,265)
-        engeller(self,139,262)
-        engeller(self,113,309)
+            # orta_ust
+            # engeller(self,144,304)
+            engeller(self,94,265)
+            engeller(self,139,262)
+            engeller(self,113,309)
 
-        # merkez
-        # engeller(self,258,296)
-        engeller(self,260,261)
-        engeller(self,287,257)
-        engeller(self,288,297)
+            # merkez
+            # engeller(self,258,296)
+            engeller(self,260,261)
+            engeller(self,287,257)
+            engeller(self,288,297)
 
-        engeller(self,414,256)
-        engeller(self,452,255)
-        engeller(self,457,299)
-        engeller(self,417,296)
+            engeller(self,414,256)
+            engeller(self,452,255)
+            engeller(self,457,299)
+            engeller(self,417,296)
 
-        # sag_üst
-        # engeller(self,123,416)
-        engeller(self,92,418)
-        engeller(self,130,457)
-        engeller(self,106,457)
+            # sag_üst
+            # engeller(self,123,416)
+            engeller(self,92,418)
+            engeller(self,130,457)
+            engeller(self,106,457)
 
-        # sag_orta
-        # engeller(self,255,420)
-        engeller(self,282,421)
-        engeller(self,296,441)
-        engeller(self,270,453)
+            # sag_orta
+            # engeller(self,255,420)
+            engeller(self,282,421)
+            engeller(self,296,441)
+            engeller(self,270,453)
 
-        engeller(self,419,412)
-        engeller(self,444,411)
-        engeller(self,423,448)
-        engeller(self,461,446)
+            engeller(self,419,412)
+            engeller(self,444,411)
+            engeller(self,423,448)
+            engeller(self,461,446)
 
-        # kavsak
-        engeller(self,189,345)
-        engeller(self,217,344)
-        engeller(self,184,379)
-        engeller(self,217,370)
+            # kavsak
+            engeller(self,189,345)
+            engeller(self,217,344)
+            engeller(self,184,379)
+            engeller(self,217,370)

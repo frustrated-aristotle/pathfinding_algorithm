@@ -65,6 +65,8 @@ if __name__ == '__main__':
         # print(path)
         # drive gui
         gui.run_game(path=path)
+        path, g, rhs = dstar.move_and_replan(robot_position=new_position)
+        gui.run_game(path=path)
         new_position = gui.current
         new_observation = gui.observation
         new_map = gui.world
